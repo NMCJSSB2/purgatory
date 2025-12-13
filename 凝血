@@ -1,0 +1,32 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local PlrDamaged = ReplicatedStorage:WaitForChild("OnServerEvents"):WaitForChild("PlrDamaged")
+
+if not humanoid:FindFirstChild("HalfDamageHealBound") then
+	local marker = Instance.new("BoolValue")
+	marker.Name = "HalfDamageHealBound"
+	marker.Parent = humanoid
+
+	local lastHealth = humanoid.Health
+
+	RunService.RenderStepped:Connect(function()
+		local currentHealth = humanoid.Health
+		local maxHealth = humanoid.MaxHealth
+
+		if currentHealth <= maxHealth * 0.5 then
+			local damageTaken = lastHealth - currentHealth
+			if damageTaken > 0 then
+				local healAmount = - (damageTaken / 2)
+				PlrDamaged:FireServer(healAmount)
+			end
+		end
+
+		lastHealth = currentHealth
+	end)
+end
