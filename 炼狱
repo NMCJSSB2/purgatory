@@ -1,0 +1,161 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local abilities = {
+	{id = 1, image = "rbxassetid://120055383207073", color = Color3.fromRGB(220, 60, 60), name = "凝血", desc = "血量少于30%时减少50%伤害", script = "https://raw.githubusercontent.com/NMCJSSB2/purgatory/refs/heads/main/%E5%87%9D%E8%A1%80"},
+	{id = 2, image = "rbxassetid://86879241039302", color = Color3.fromRGB(220, 60, 60), name = "杀意", desc = "当怪物接近自己时受到攻击", script = "https://raw.githubusercontent.com/NMCJSSB2/purgatory/refs/heads/main/%E6%9D%80%E6%84%8F"},
+	{id = 3, image = "rbxassetid://132539710306723", color = Color3.fromRGB(60, 200, 100), name = "坚韧", desc = "每隔15秒回复一滴血", script = "https://raw.githubusercontent.com/NMCJSSB2/purgatory/refs/heads/main/%E5%9D%9A%E9%9F%A7"},
+	{id = 4, image = "rbxassetid://108950222654017", color = Color3.fromRGB(240, 200, 60), name = "反弹", desc = "玩家血量处于20%以下时被攻击到给最近的敌人造成伤害(仅可使用10次)", script = "https://raw.githubusercontent.com/NMCJSSB2/purgatory/refs/heads/main/%E5%8F%8D%E5%BC%B9"},
+	{id = 5, image = "rbxassetid://102838169574099", color = Color3.fromRGB(100, 180, 240), name = "链接", desc = "当玩家血量处于10%以下被攻击时，给全图怪物造成10次伤害(仅可使用一次)", script = "https://raw.githubusercontent.com/NMCJSSB2/purgatory/refs/heads/main/%E9%93%BE%E6%8E%A5"}
+}
+
+local COOLDOWN = 120
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "AbilitySelectGui"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local topFrame = Instance.new("Frame")
+topFrame.Size = UDim2.fromScale(1, 0)
+topFrame.Position = UDim2.fromScale(0, 0.06)
+topFrame.BackgroundTransparency = 1
+topFrame.Visible = false
+topFrame.Parent = gui
+
+local centerFrame = Instance.new("Frame")
+centerFrame.Size = UDim2.fromScale(0.32, 0.30)
+centerFrame.Position = UDim2.fromScale(0.5, 0.46)
+centerFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+centerFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+centerFrame.BackgroundTransparency = 0.5
+centerFrame.BorderSizePixel = 0
+centerFrame.Visible = false
+centerFrame.Parent = gui
+
+local abilityName = Instance.new("TextLabel")
+abilityName.Size = UDim2.fromScale(0.9, 0.15)
+abilityName.Position = UDim2.fromScale(0.05, 0.05)
+abilityName.AnchorPoint = Vector2.new(0, 0)
+abilityName.BackgroundTransparency = 1
+abilityName.TextColor3 = Color3.new(1, 1, 1)
+abilityName.TextScaled = true
+abilityName.Font = Enum.Font.GothamBold
+abilityName.TextXAlignment = Enum.TextXAlignment.Left
+abilityName.Text = ""
+abilityName.Parent = centerFrame
+
+local desc = Instance.new("TextLabel")
+desc.Size = UDim2.fromScale(0.6, 0.75)
+desc.Position = UDim2.fromScale(0.05, 0.25)
+desc.AnchorPoint = Vector2.new(0, 0)
+desc.BackgroundTransparency = 1
+desc.TextColor3 = Color3.new(1, 1, 1)
+desc.TextScaled = true
+desc.TextWrapped = true
+desc.Font = Enum.Font.Gotham
+desc.Text = ""
+desc.Parent = centerFrame
+
+local abilityPreview = Instance.new("ImageLabel")
+abilityPreview.Size = UDim2.fromScale(0.4, 0.9)
+abilityPreview.Position = UDim2.fromScale(0.82, 0.5)
+abilityPreview.AnchorPoint = Vector2.new(0.5, 0.5)
+abilityPreview.BackgroundTransparency = 1
+abilityPreview.Visible = false
+abilityPreview.Parent = centerFrame
+
+local selectButton = Instance.new("TextButton")
+selectButton.Size = UDim2.fromScale(0.22, 0.06)
+selectButton.Position = UDim2.fromScale(0.5, 0.68)
+selectButton.AnchorPoint = Vector2.new(0.5, 0.5)
+selectButton.BackgroundColor3 = Color3.fromRGB(60, 200, 100)
+selectButton.BorderSizePixel = 0
+selectButton.Text = "选择"
+selectButton.TextScaled = true
+selectButton.Font = Enum.Font.GothamBold
+selectButton.TextColor3 = Color3.new(1, 1, 1)
+selectButton.Visible = false
+selectButton.Parent = gui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 14)
+corner.Parent = selectButton
+
+local currentButtons = {}
+local selectedAbility = nil
+
+local function clearTopButtons()
+	for _, btn in ipairs(currentButtons) do
+		btn:Destroy()
+	end
+	currentButtons = {}
+end
+
+local function getTwoRandomAbilities()
+	local pool = table.clone(abilities)
+	local result = {}
+	for i = 1, 2 do
+		local index = math.random(#pool)
+		table.insert(result, pool[index])
+		table.remove(pool, index)
+	end
+	return result
+end
+
+local function showAbilitySelect()
+	selectedAbility = nil
+	clearTopButtons()
+	local chosen = getTwoRandomAbilities()
+	for i, ability in ipairs(chosen) do
+		local btn = Instance.new("ImageButton")
+		btn.Size = UDim2.fromOffset(40, 40)
+		btn.AnchorPoint = Vector2.new(0.5, 0.5)
+		btn.Position = UDim2.fromScale(0.46 + (i - 1) * 0.08, 0)
+		btn.BackgroundColor3 = Color3.new(0, 0, 0)
+		btn.BorderSizePixel = 0
+		btn.Rotation = 45
+		btn.AutoButtonColor = false
+		btn.Parent = topFrame
+
+		local icon = Instance.new("ImageLabel")
+		icon.Size = UDim2.fromScale(0.65, 0.65)
+		icon.Position = UDim2.fromScale(0.5, 0.5)
+		icon.AnchorPoint = Vector2.new(0.5, 0.5)
+		icon.BackgroundTransparency = 1
+		icon.Image = ability.image
+		icon.ImageColor3 = ability.color
+		icon.Rotation = -45
+		icon.Parent = btn
+
+		btn.MouseButton1Click:Connect(function()
+			selectedAbility = ability
+			centerFrame.Visible = true
+			selectButton.Visible = true
+			abilityPreview.Image = ability.image
+			abilityPreview.ImageColor3 = ability.color
+			abilityPreview.Visible = true
+			abilityName.Text = ability.name
+			desc.Text = ability.desc
+		end)
+
+		table.insert(currentButtons, btn)
+	end
+	topFrame.Visible = true
+end
+
+selectButton.MouseButton1Click:Connect(function()
+	if not selectedAbility then return end
+	if selectedAbility.script then
+		loadstring(game:HttpGet(selectedAbility.script))()
+	end
+	centerFrame.Visible = false
+	selectButton.Visible = false
+	topFrame.Visible = false
+	abilityPreview.Visible = false
+	task.delay(COOLDOWN, function()
+		showAbilitySelect()
+	end)
+end)
+
+showAbilitySelect()
