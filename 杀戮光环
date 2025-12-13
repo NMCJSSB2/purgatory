@@ -1,0 +1,118 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+
+local CombatRemote = ReplicatedStorage
+	:WaitForChild("OnServerEvents")
+	:WaitForChild("CombatServer")
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "DiamondAttackGui"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local button = Instance.new("ImageButton")
+button.Size = UDim2.fromOffset(40, 40)
+button.Position = UDim2.fromScale(0.5, 0.6)
+button.AnchorPoint = Vector2.new(0.5, 0.5)
+button.BackgroundColor3 = Color3.new(0, 0, 0)
+button.BorderSizePixel = 0
+button.Rotation = 45
+button.AutoButtonColor = false
+button.Parent = gui
+
+local icon = Instance.new("ImageLabel")
+icon.Size = UDim2.fromScale(0.65, 0.65)
+icon.Position = UDim2.fromScale(0.5, 0.5)
+icon.AnchorPoint = Vector2.new(0.5, 0.5)
+icon.BackgroundTransparency = 1
+icon.Image = "rbxassetid://109210663761662"
+icon.ImageColor3 = Color3.new(1, 1, 1)
+icon.Rotation = -45
+icon.Parent = button
+
+local running = false
+local connection
+
+local dragging = false
+local dragStart
+local startPos
+
+local function updateDrag(input)
+	local delta = input.Position - dragStart
+	button.Position = UDim2.new(
+		startPos.X.Scale,
+		startPos.X.Offset + delta.X,
+		startPos.Y.Scale,
+		startPos.Y.Offset + delta.Y
+	)
+end
+
+button.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+	or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = button.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if dragging and (
+		input.UserInputType == Enum.UserInputType.MouseMovement
+		or input.UserInputType == Enum.UserInputType.Touch
+	) then
+		updateDrag(input)
+	end
+end)
+
+local function startLoop()
+	connection = RunService.RenderStepped:Connect(function()
+		local enemies = workspace:FindFirstChild("Enemies")
+		if not enemies then return end
+
+		for _, npc in ipairs(enemies:GetChildren()) do
+			local hrp = npc:FindFirstChild("HumanoidRootPart")
+			if hrp then
+				local args = {
+					hrp,
+					"Melee",
+					{
+						dismantle = true,
+						riposte = true,
+						backstab = true
+					}
+				}
+				CombatRemote:FireServer(unpack(args))
+			end
+		end
+	end)
+end
+
+local function stopLoop()
+	if connection then
+		connection:Disconnect()
+		connection = nil
+	end
+end
+
+button.MouseButton1Click:Connect(function()
+	running = not running
+
+	if running then
+		icon.ImageColor3 = Color3.fromRGB(255, 60, 60)
+		startLoop()
+	else
+		icon.ImageColor3 = Color3.new(1, 1, 1)
+		stopLoop()
+	end
+end)
