@@ -1,0 +1,32 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+local triggeredNPCs = {}
+local ATTACK_DISTANCE = 10
+
+RunService.RenderStepped:Connect(function()
+    for _, npc in pairs(Workspace:WaitForChild("Enemies"):GetChildren()) do
+        if npc:FindFirstChild("HumanoidRootPart") and not triggeredNPCs[npc.Name] then
+            local distance = (rootPart.Position - npc.HumanoidRootPart.Position).Magnitude
+            if distance <= ATTACK_DISTANCE then
+                triggeredNPCs[npc.Name] = true
+                local args = {
+                    npc:WaitForChild("HumanoidRootPart"),
+                    "Melee",
+                    {
+                        dismantle = false,
+                        riposte = false,
+                        backstab = false
+                    }
+                }
+                ReplicatedStorage:WaitForChild("OnServerEvents"):WaitForChild("CombatServer"):FireServer(unpack(args))
+            end
+        end
+    end
+end)
