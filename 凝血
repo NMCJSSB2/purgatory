@@ -19,7 +19,7 @@ if not humanoid:FindFirstChild("HalfDamageHealBound") then
 		local currentHealth = humanoid.Health
 		local maxHealth = humanoid.MaxHealth
 
-		if currentHealth <= maxHealth * 0.5 then
+		if currentHealth <= maxHealth * 0.3 then
 			local damageTaken = lastHealth - currentHealth
 			if damageTaken > 0 then
 				local healAmount = - (damageTaken / 2)
