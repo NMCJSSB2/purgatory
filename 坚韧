@@ -1,0 +1,14 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local timer = 0
+local INTERVAL = 15
+
+RunService.RenderStepped:Connect(function(deltaTime)
+    timer = timer + deltaTime
+    if timer >= INTERVAL then
+        timer = 0
+        local args = {-1}
+        ReplicatedStorage:WaitForChild("OnServerEvents"):WaitForChild("PlrDamaged"):FireServer(unpack(args))
+    end
+end)
