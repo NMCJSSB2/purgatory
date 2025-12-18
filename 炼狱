@@ -9,7 +9,7 @@ local abilities = {
 	{id = 5, image = "rbxassetid://102838169574099", color = Color3.fromRGB(100, 180, 240), name = "链接", desc = "当玩家血量处于10%以下被攻击时，给全图怪物造成10次伤害(仅可使用一次)", script = "https://raw.githubusercontent.com/NMCJSSB2/purgatory/refs/heads/main/%E9%93%BE%E6%8E%A5"}
 }
 
-local COOLDOWN = 60
+local COOLDOWN = 45
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "AbilitySelectGui"
