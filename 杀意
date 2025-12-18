@@ -20,8 +20,8 @@ RunService.RenderStepped:Connect(function()
                     npc:WaitForChild("HumanoidRootPart"),
                     "Melee",
                     {
-                        dismantle = false,
-                        riposte = false,
+                        dismantle = true,
+                        riposte = true,
                         backstab = true
                     }
                 }
