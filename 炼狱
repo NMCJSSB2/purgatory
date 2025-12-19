@@ -4,7 +4,7 @@ local player = Players.LocalPlayer
 local abilities = {
 	{id = 1, image = "rbxassetid://120055383207073", color = Color3.fromRGB(220, 60, 60), name = "凝血", desc = "血量少于30%时减少50%伤害", script = "https://raw.githubusercontent.com/NMCJSSB2/purgatory/refs/heads/main/%E5%87%9D%E8%A1%80"},
 	{id = 2, image = "rbxassetid://86879241039302", color = Color3.fromRGB(220, 60, 60), name = "杀意", desc = "当怪物接近自己时受到攻击", script = "https://raw.githubusercontent.com/NMCJSSB2/purgatory/refs/heads/main/%E6%9D%80%E6%84%8F"},
-	{id = 3, image = "rbxassetid://132539710306723", color = Color3.fromRGB(60, 200, 100), name = "坚韧", desc = "每隔15秒回复一滴血", script = "https://raw.githubusercontent.com/NMCJSSB2/purgatory/refs/heads/main/%E5%9D%9A%E9%9F%A7"},
+	{id = 3, image = "rbxassetid://132539710306723", color = Color3.fromRGB(60, 200, 100), name = "坚韧", desc = "每隔5秒回复一滴血", script = "https://raw.githubusercontent.com/NMCJSSB2/purgatory/refs/heads/main/%E5%9D%9A%E9%9F%A7"},
 	{id = 4, image = "rbxassetid://108950222654017", color = Color3.fromRGB(240, 200, 60), name = "反弹", desc = "玩家血量处于20%以下时被攻击到给最近的敌人造成伤害(仅可使用10次)", script = "https://raw.githubusercontent.com/NMCJSSB2/purgatory/refs/heads/main/%E5%8F%8D%E5%BC%B9"},
 	{id = 5, image = "rbxassetid://102838169574099", color = Color3.fromRGB(100, 180, 240), name = "链接", desc = "当玩家血量处于10%以下被攻击时，给全图怪物造成10次伤害(仅可使用一次)", script = "https://raw.githubusercontent.com/NMCJSSB2/purgatory/refs/heads/main/%E9%93%BE%E6%8E%A5"}
 }
